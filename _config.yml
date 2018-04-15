@@ -1,0 +1,18 @@
+# Setup
+title:        jiangcy1994's blog
+tagline:      jiangcy1994的博客
+baseurl:      ""
+paginate:     1
+locale:       "en"
+
+# About/contact
+author:
+  name:       jiangcy1994
+  url:        https://jiangcy1994.github.io
+
+# Gems
+gems:
+  - jekyll-paginate
+
+#Others
+markdown: kramdown
