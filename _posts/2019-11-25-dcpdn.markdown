@@ -1,0 +1,57 @@
+---
+layout: default
+title:  "DCPDN日记"
+date:   2019-11-25 21:00:00
+categories: network
+---
+
+# DCPDN
+
+DCPDN可以同时训练透射图，大气光和去雾。改模型通过将大气散射模型直接嵌入到网络中来实现端到端学习，从而确保所提出的方法严格遵循物理驱动的散射模型进行除雾。
+
+文章： [Deep Joint Rain Detection and Removal from a Single Image](https://arxiv.org/abs/1803.08396)
+
+# DCPDN理论
+
+## 物理模型
+
+$I(z)=J(z)t(z)+A(z)(1−t(z))$,
+
+$I$是观测到的有雾的图片，$J$是真实场景，$A$是全局大气光强，$t$是投射图，$z$是像素位置
+
+$\hat{J}(z)=\frac{I(z)-\hat{A}(z)(1-\hat{t}(z))}{\hat{t}(z)}$
+
+## 目标函数
+
+### 
+
+### 保边损耗
+
+$L_{E}=\lambda_{E,l_2}L_{E,l_2}+\lambda_{E,g}L_{E,g}+\lambda_{E,f}L_{E,f}$
+
+* $L_{E,l_2}$为L2误差
+* $L_{E,g}=\sum_{w,h}\|\|(H_x(G_x(I)))_{w,h}-(H_x(t))_{w,h}\|\|_2+\|\|(H_y(G_x(I)))_{w,h}-(H_y(t))_{w,h}\|\|_2$ 双向（水平和垂直）梯度误差
+* $L_{E,f}=\sum_{c_1,w_1,h_1}\|\|(V_1(G_t(I)))_{c_1,w_1,h_1}-(V_1(t))_{c_1,w_1,h_1}\|\|_2+\sum_{c_2,w_2,h_2}\|\|(V_2(G_t(I)))_{c_2,w_2,h_2}-(V_2(t))_{c_2,w_2,h_2}\|\|_2$
+  * $V_i$代表CNN结构
+
+### 全损失
+
+$L=L_t+L_a+L_d+\lambda_jL_j$
+
+* $L_t=L_E$
+* $L_a$为大气光强的L2误差
+* $L_d$为去雾的L2误差
+* $L_j$为联合鉴别损失
+  * $L_j=−log(D_{joint}(G_t(I))−log(D_{joint}(G_d(I))$
+
+## 实现参数
+
+$\lambda_{E,l_2}=1$
+
+$\lambda_{E,g}=0.5$
+
+$\lambda_{E,f}=0.8$
+
+$\lambda_j=0.25$
+
+优化算法：Adam，学习率$2\times10^{-3}$
