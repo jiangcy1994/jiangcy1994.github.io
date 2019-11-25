@@ -1,0 +1,27 @@
+---
+layout: default
+title:  "CycleGAN日记"
+date:   2019-11-25 19:00:00
+categories: Network
+---
+
+# CycleGAN
+
+CycleGAN 是一种Gan（生成式对抗网络）。用于对两个成对图片域A和域B间进行映射。
+
+## 该模型由两个判别器和生成器构成。
+
+两个判别器可标记为 $d_A$, $d_B$，分别对图片是否属于A或者B进行判断
+
+两个生成去可标记为 $g_A_to_B$， $g_B_to_A$，分别为从A到B和从B到A的映射
+
+https://arxiv.org/abs/1703.10593
+
+
+# CycleGAN 判别器
+
+
+
+
+
+
