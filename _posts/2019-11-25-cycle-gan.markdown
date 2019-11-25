@@ -9,7 +9,7 @@ categories: network
 
 CycleGAN 是一种Gan（生成式对抗网络）。用于对两个成对图片域A和域B间进行映射。
 
-文章：https://arxiv.org/abs/1703.10593
+文章： [Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks](https://arxiv.org/abs/1703.10593)
 
 # CycleGAN理论
 
@@ -29,7 +29,7 @@ $L_{GAN}(F, D_X, Y, X)=E_{x \sim p_{data}(x)}[\log D_X(x)]+E_{y\sim p_{data}(y)}
 
 $L_{GAN}(G, D_Y, X, Y)=E_{y \sim p_{data}(y)}[\log D_Y(y)]+E_{x\sim p_{data}(x)}[\log (1-D_Y(G(x)))]$
 
-$L_{cyc}(G, F)=E_{y\sim p_{data}(y)}[||F(G(x))-x||]+E_{y\sim p_{data}(y)}[||G(F(y))-y||]$
+$L_{cyc}(G, F)=E_{y\sim p_{data}(y)}[\|F(G(x))-x\|]+E_{y\sim p_{data}(y)}[\|G(F(y))-y\|]$
 
 $L(G, F, D_X, D_Y) =L_{GAN}(G, D_Y, X, Y) + L_{GAN}(F, D_X, Y, X)+ \lambda L_{cyc}(G, F)$
 
