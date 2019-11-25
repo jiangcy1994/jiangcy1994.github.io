@@ -39,40 +39,71 @@ $G^\star, F^\star=arg\, \underset {G,F}{\min} \underset{D_X,D_Y}{\max} L(G, F, D
 
 # CycleGAN实现
 
+## 工具函数
+
+``` python
+from functools import reduce
+
+def compose(*funcs):
+    if funcs:
+        return reduce(lambda f, g: lambda *a, **kw: g(f(*a, **kw)), funcs)
+    else:
+        raise ValueError('Composition of empty sequence not supported.')
+
+```
+
+
 ## CycleGAN判别器
 
 ``` python
-num_channels_in, num_discriminator_filter, max_layers=3, use_sigmoid=True
-input_a = Input(shape=(None, None, num_channels_in))
-t = input_a
-t = Conv2D(num_discriminator_filter, kernel_size=4, strides=2, padding="same", name='First') (t)
-t = LeakyReLU(alpha=0.2)(t)
+num_channels_in
+num_discriminator_filter
+max_layers=3
+use_sigmoid=True
 
-for layer in range(1, max_layers):
-    out_feat = num_discriminator_filter * min(2**layer, 8)
-    t = Conv2D(out_feat, kernel_size=4, strides=2, padding="same", 
-                use_bias=False, name='pyramid.{0}'.format(layer)
-                )(t)
-    t = batchnorm()(t, training=1)
-    t = LeakyReLU(alpha=0.2)(t)
+img_input = Input(shape=(None, None, num_channels_in), name='img_input')
 
-out_feat = num_discriminator_filter*min(2**max_layers, 8)
-t = Conv2D(out_feat, kernel_size=4, padding='same', use_bias=False, name='pyramid_last')(t)
-t = batchnorm()(t, training=1)
-t = LeakyReLU(alpha=0.2)(t)
+layers = compose(
+    Conv2D(num_discriminator_filter, kernel_size=4, strides=2, padding="same", name='first_conv'),
+    LeakyReLU(alpha=0.2, name='first_lrelu')
+)
+
+for layer_idx in range(1, max_layers):
+    conv_filter = num_discriminator_filter * min(2**layer_idx, 8)
+    name_prefix = 'pyramid.{0}'.format(layer_idx)
+    layers = compose(
+        layers,
+        Conv2D(conv_filter, kernel_size=4, strides=2, padding="same", use_bias=False, name=name_prefix + '_conv'),
+        BatchNormalization(momentum=0.9, epsilon=1.01e-5, name=name_prefix + '_bn'),
+        LeakyReLU(alpha=0.2, name=name_prefix + '_lrelu')
+    )
+
+conv_filter = num_discriminator_filter * min(2**max_layers, 8)
+layers = compose(
+    layers,
+    Conv2D(conv_filter, kernel_size=4, strides=2, padding="same", use_bias=False, name='pyramid_last_conv'),
+    BatchNormalization(momentum=0.9, epsilon=1.01e-5, training=1, name='pyramid_last_bn'),
+    LeakyReLU(alpha=0.2, name='pyramid_last_lrelu')
+)
 
 # final layer
-t = Conv2D(1, kernel_size=4, name='final'.format(out_feat, 1), padding='same',
-            activation="sigmoid" if use_sigmoid else None
-            )(t)    
-return Model(inputs=[input_a], outputs=t)
+layers = compose(
+    layers,
+    Conv2D(1, kernel_size=4, name='final_conv', padding='same', activation='sigmoid' if use_sigmoid else None)
+) 
+
+discriminator_model = Model(inputs=[img_input], outputs=[layers(img_input)])
 ```
 
 ## CycleGAN生成器
 
 
 ``` python
-isize, num_channel_in=3, num_channel_out=3, num_generator_filter=64, fixed_input_size=True
+img_size
+num_channel_in=3
+num_channel_out=3
+num_generator_filter=64
+fixed_input_size=True
 max_num_filter = 8 * num_generator_filter
 
 def block(x, size, num_filter_in, use_batchnorm=True, num_filter_out=None, num_filter_next=None):
@@ -100,9 +131,9 @@ def block(x, size, num_filter_in, use_batchnorm=True, num_filter_out=None, num_f
         x = Dropout(0.5)(x, training=1)
     return x
 
-size = isize if fixed_input_size else None
+size = img_size if fixed_input_size else None
 t = inputs = Input(shape=(size, size, num_channel_in))        
-t = block(t, isize, num_channel_in, False, num_filter_out=num_channel_out, num_filter_next=num_generator_filter)
+t = block(t, img_size, num_channel_in, False, num_filter_out=num_channel_out, num_filter_next=num_generator_filter)
 t = Activation('tanh')(t)
-return Model(inputs=inputs, outputs=[t])
+generator_model = Model(inputs=inputs, outputs=[t])
 ```
