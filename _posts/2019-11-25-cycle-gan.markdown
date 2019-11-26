@@ -13,7 +13,7 @@ CycleGAN 是一种Gan（生成式对抗网络）。用于对两个成对图片�
 
 [文章对应网站](https://junyanz.github.io/CycleGAN/)
 
-# CycleGAN理论
+# 理论模型
 
 图片源域：$X$, 图片目标域$Y$
 
