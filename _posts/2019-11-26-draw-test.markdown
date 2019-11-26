@@ -4,7 +4,7 @@ title:  "绘图测试"
 date:   2019-11-26 10:00:00
 categories: test
 ---
-
+{% mermaid %}
 ```mermaid
 graph TB
     c1-->a2
@@ -18,3 +18,4 @@ graph TB
     c1-->c2
     end
 ```
+{% endmermaid %}
