@@ -19,4 +19,4 @@ gems:
 markdown: kramdown
 
 mermaid:
-    src: /js/mermaid.min.js
+    src: '/js/mermaid.min.js'
