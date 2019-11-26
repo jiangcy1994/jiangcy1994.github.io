@@ -27,81 +27,72 @@ CycleGAN 是一种Gan（生成式对抗网络）。用于对两个成对图片�
 
 ## 目标函数
 
-$L_{GAN}(F, D_X, Y, X)=E_{x \sim p_{data}(x)}[\log D_X(x)]+E_{y\sim p_{data}(y)}[\log (1-D_X(F(y)))]$
+$G^\star, F^\star=arg\, \underset {G,F}{\min} \underset{D_X,D_Y}{\max} L(G, F, D_X, D_Y)=L_{GAN}(G, D_Y, X, Y) + L_{GAN}(F, D_X, Y, X)+ \lambda L_{cyc}(G, F)$
 
-$L_{GAN}(G, D_Y, X, Y)=E_{y \sim p_{data}(y)}[\log D_Y(y)]+E_{x\sim p_{data}(x)}[\log (1-D_Y(G(x)))]$
+* $L_{GAN}(F, D_X, Y, X)=E_{x \sim p_{data}(x)}[\log D_X(x)]+E_{y\sim p_{data}(y)}[\log (1-D_X(F(y)))]$
+* $L_{GAN}(G, D_Y, X, Y)=E_{y \sim p_{data}(y)}[\log D_Y(y)]+E_{x\sim p_{data}(x)}[\log (1-D_Y(G(x)))]$
+* $L_{cyc}(G, F)=E_{y\sim p_{data}(y)}[\|\|F(G(x))-x\|\|]+E_{y\sim p_{data}(y)}[\|\|G(F(y))-y\|\|]$
 
-$L_{cyc}(G, F)=E_{y\sim p_{data}(y)}[\|\|F(G(x))-x\|\|]+E_{y\sim p_{data}(y)}[\|\|G(F(y))-y\|\|]$
-
-$L(G, F, D_X, D_Y) =L_{GAN}(G, D_Y, X, Y) + L_{GAN}(F, D_X, Y, X)+ \lambda L_{cyc}(G, F)$
-
-$G^\star, F^\star=arg\, \underset {G,F}{\min} \underset{D_X,D_Y}{\max} L(G, F, D_X, D_Y)$
-
-# CycleGAN实现
-
-## CycleGAN判别器
-
-``` python
-conv2d = partial(Conv2D, kernel_size=4, strides=2, padding="same", use_bias=False)
-bn = partial(BatchNormalization, momentum=0.9, epsilon=1.01e-5)
-lrelu = partial(LeakyReLU, alpha=0.2)
-```
+## 训练过程
 
 ``` mermaid
-graph TB
-    subgraph Inputs
-        img_input["Input((?, ?, 3))"]
-    end
-    subgraph Outputs
-        output["((?,?,1))"]
+graph TD
+    subgraph Input
+        ImageInputX["X"]
+        ImageInputY["Y"]
+        RealLabel["RealLabel"]
     end
 
-    img_input --> block_0["conv2d(ndf)/lrelu"]
-    block_0 --> block_1["conv2d(ndf*min(2^1,8))/bn/lrelu"]
-    block_1 -- ... --> block_n["conv2d(ndf*min(2^n,8))/bn/lrelu"]
-    block_n --> block_final["conv2d(1)"]
-    block_final -->output
+    subgraph NetResult
+        FX["F(X)"]
+        FY["F(Y)"]
+        FGX["F(G(X))"]
+        GX["G(X)"]
+        GY["G(Y)"]
+        GFY["G(F(Y))"]
+    end
+
+    subgraph Output
+        TotalLoss["L_total(weighted sum)"]
+        GANLoss["L_GAN(mean)"] --> TotalLoss
+        GANLossX["L_GANX(mse/bce)"] --> GANLoss
+        GANLossY["L_GANY(mse/bce)"] --> GANLoss
+        CycLoss["L_cyc(mean)"] --> TotalLoss
+        CycLossX["L_cycX(mae)"] --> CycLoss
+        CycLossY["L_cycY(mae)"] --> CycLoss
+        IdLoss["L_id(mean)"] --> TotalLoss
+        IdLossX["L_idX(mae)"] --> IdLoss
+        IdLossY["L_idY(mae)"] --> IdLoss
+    end
+
+    FX --> IdLossX
+    ImageInputX --> IdLossX
+    GY --> IdLossY
+    ImageInputY --> IdLossY
+
+    FY --> GANLossX
+    RealLabel --> GANLossX
+    GX --> GANLossY
+    RealLabel --> GANLossY
+
+    FGX --> CycLossX
+    ImageInputX --> CycLossX
+    GFY --> CycLossY
+    ImageInputY --> CycLossX
 ```
 
-## CycleGAN生成器
+# 网络实现
 
+## 判别器
 
-``` python
-img_size
-num_channel_in=3
-num_channel_out=3
-num_generator_filter=64
-fixed_input_size=True
-max_num_filter = 8 * num_generator_filter
+* basic
+* imageGAN
+* n_layers
 
-def block(x, size, num_filter_in, use_batchnorm=True, num_filter_out=None, num_filter_next=None):
-    assert size >= 2 and size % 2 == 0
-    if num_filter_next is None:
-        num_filter_next = min(num_filter_in*2, max_num_filter)
-    if num_filter_out is None:
-        num_filter_out = num_filter_in
-    x = Conv2D(num_filter_next, kernel_size=4, strides=2, use_bias=(not (use_batchnorm and size > 2)),
-                padding='same', name='conv_{0}'.format(size)
-                )(x)
-    if size > 2:
-        if use_batchnorm:
-            x = BatchNormalization(momentum=0.9, epsilon=1.01e-5)(x, training=1)
-        x2 = LeakyReLU(alpha=0.2)(x)
-        x2 = block(x2, size//2, num_filter_next)
-        x = Concatenate()([x, x2])            
-    x = Activation("relu")(x)
-    x = Conv2DTranspose(num_filter_out, kernel_size=4, strides=2, use_bias=not use_batchnorm,
-                        name='convt.{0}'.format(size))(x)        
-    x = Cropping2D(1)(x)
-    if use_batchnorm:
-        x = BatchNormalization(momentum=0.9, epsilon=1.01e-5)(x, training=1)
-    if size <= 8:
-        x = Dropout(0.5)(x, training=1)
-    return x
+## 生成器
 
-size = img_size if fixed_input_size else None
-t = inputs = Input(shape=(size, size, num_channel_in))        
-t = block(t, img_size, num_channel_in, False, num_filter_out=num_channel_out, num_filter_next=num_generator_filter)
-t = Activation('tanh')(t)
-generator_model = Model(inputs=inputs, outputs=[t])
-```
+* encoder_decoder
+* unet128
+* unet256
+* resnet_6blocks
+* resnet_9blocks
