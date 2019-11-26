@@ -16,3 +16,6 @@ gems:
 
 #Others
 markdown: kramdown
+
+mermaid:
+   src: https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.3.1/mermaid.min.js
