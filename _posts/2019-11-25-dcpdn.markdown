@@ -11,7 +11,9 @@ DCPDN可以同时训练透射图，大气光和去雾。改模型通过将大气
 
 文章： [Deep Joint Rain Detection and Removal from a Single Image](https://arxiv.org/abs/1803.08396)
 
-# DCPDN理论
+[文章对应网站](https://github.com/hezhangsprinter/DCPDN)
+
+# 理论模型
 
 ## 物理模型
 
