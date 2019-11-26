@@ -11,20 +11,29 @@ Pix2pix学习从输入图像到输出图像的映射，而且学习损失函数�
 
 文章： [Image-to-image translation with conditional adversarial networks](https://arxiv.org/pdf/1611.07004.pdf)
 
+[文章对应网站](https://github.com/phillipi/pix2pix)
+
 # Pix2pix理论
 
 ## 目标函数
 
 $G^\star=arg\,\underset{G}{\min}\underset{D}{\max}L_{cGAN}(G,D)+\lambda L_{L1}(G)$
-
 * $L_{cGAN}=E_{x,y}[\log D(x,y)]+E_{x,z}[\log(1-D(x,G(x,z)))]$
 * $L_{GAN}=E_{y}[\log D(y)]+E_{x,z}[\log(1-D(G(x,z)))]$
 * $L_{L1}=E_{x,y,z}[\|\|y-G(x,z)\|\|_1]$
 
-## 生成网络
+# 网络实现
+
+## 判别器
+
+1. basic
+2. n_layers
+
+## 生成器
 
 1. encoder-decoder
-2. U-Net
+2. unet
+2. unet_128
 
 ## 实现参数
 
