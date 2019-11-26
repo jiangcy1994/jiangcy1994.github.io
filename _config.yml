@@ -13,7 +13,6 @@ author:
 # Gems
 gems:
   - jekyll-paginate
-  - jekyll-mermaid
 
 #Others
 markdown: kramdown
