@@ -7,9 +7,11 @@ categories: network
 
 # CycleGAN
 
-CycleGAN 是一种Gan（生成式对抗网络）。用于对两个成对图片域A和域B间进行映射。
+CycleGAN 是一种Gan（生成式对抗网络）。用于对两个成对图片域X和域Y间进行映射。
 
 文章： [Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks](https://arxiv.org/abs/1703.10593)
+
+[文章对应网站](https://junyanz.github.io/CycleGAN/)
 
 # CycleGAN理论
 
