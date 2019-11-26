@@ -8,8 +8,8 @@ categories: network
 # 去雾神经网络汇总
 
 汇总中的网络：
-* [Pix2pix](2019-11-26-pix2pix.markdown)
-* [CycleGAN](2019-11-25-cycle-gan.markdown)
+* [Pix2pix](/network/2019/11/26/pix2pix.html)
+* [CycleGAN](https://jiangcy1994.github.io/network/2019/11/25/cycle-dehaze.html)
 * [CycleDehaze](2019-11-25-cycle-dehaze.markdown)
 * [DCPDN](2019-11-25-dcpdn.markdown)
 
@@ -26,6 +26,7 @@ $\hat{J}(z)=\frac{I(z)-\hat{A}(z)(1-\hat{t}(z))}{\hat{t}(z)}$
 ## 模型共通点
 
 $D_X$, $D_Y$, 分别为$X$和$Y$的判别器
+
 $G$ $F$，分别为从$X$到$Y$和从$Y$到$X$的映射
 
 ## 目标函数对比
