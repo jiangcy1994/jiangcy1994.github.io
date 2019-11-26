@@ -9,9 +9,9 @@ categories: network
 
 汇总中的网络：
 * [Pix2pix](/network/2019/11/26/pix2pix.html)
-* [CycleGAN](https://jiangcy1994.github.io/network/2019/11/25/cycle-dehaze.html)
-* [CycleDehaze](2019-11-25-cycle-dehaze.markdown)
-* [DCPDN](2019-11-25-dcpdn.markdown)
+* [CycleGAN](/network/2019/11/25/cycle-dehaze.html)
+* [CycleDehaze](/network/2019/11/25/cycle-gan.html)
+* [DCPDN](/network/2019/11/25/dcpdn.html)
 
 # 去雾理论模型
 
