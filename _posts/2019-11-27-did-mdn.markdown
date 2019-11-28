@@ -1,0 +1,39 @@
+---
+layout: default
+title:  "DID-MDN日记"
+date:   2019-11-27 13:00:00
+categories: network
+---
+
+# DCPDN
+
+DID-MDN能去除图像中不均匀的雨水密度。该网络有一种新颖的基于密度感知的多流密集连接的卷积神经网络算法，能用于联合降雨密度估算和除雨。
+
+文章： [Density-aware Single Image De-raining using a Multi-stream Dense Network](https://arxiv.org/abs/1802.07412)
+
+[文章对应网站](https://github.com/hezhangsprinter/DID-MDN)
+
+# 理论模型
+
+## 物理模型
+
+$y=x+r$
+
+$y$是观测到的有雨的图片，$x$是真实场景，$r$是雨(残差)
+
+
+
+## 目标函数
+
+### 残差分类器损失
+
+$L=L_{E,r}+L_C$
+* $L_{E,r}=MSE(target\_residual\_componet, predicted\_target\_residual\_componet)$ 
+* $L_C$ indicates the crossentropy loss for rain-density classification.
+
+### 去雨网络损失
+
+$L=L_{E,r}+L_{E,d}+\lambda_F L_F$
+* $L_{E,r}=MSE(target\_residual\_componet, predicted\_target\_residual\_componet)$ 
+* $L_{E,d}=MSE(target\_img, reconstruct\_derained\_img)$ 
+* $L_{F}=MSE(F(target\_img), F(reconstruct\_derained\_img))$ 
